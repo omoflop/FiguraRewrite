@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.blancworks.figura.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    
+  ],
+  "client": [
+    
+  ],
+  "server": [
+    
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
