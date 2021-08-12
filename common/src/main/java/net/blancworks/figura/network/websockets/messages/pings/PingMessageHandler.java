@@ -1,7 +1,6 @@
 package net.blancworks.figura.network.websockets.messages.pings;
 
 import com.google.common.io.LittleEndianDataInputStream;
-
 import net.blancworks.figura.network.websockets.messages.pubsub.ChannelMessageHandler;
 
 public class PingMessageHandler extends ChannelMessageHandler {

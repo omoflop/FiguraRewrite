@@ -1,7 +1,6 @@
 package net.blancworks.figura.network.websockets.messages;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import net.blancworks.figura.FiguraMod;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

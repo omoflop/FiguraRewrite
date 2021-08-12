@@ -1,14 +1,8 @@
 package net.blancworks.figura.network.websockets.messages.user;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.network.websockets.messages.MessageHandler;
-import net.minecraft.nbt.NbtIo;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.UUID;
 
 public class UserAvatarProvideResponseHandler extends MessageHandler {

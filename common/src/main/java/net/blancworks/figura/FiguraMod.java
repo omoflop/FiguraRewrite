@@ -1,12 +1,9 @@
 package net.blancworks.figura;
 
-import me.shedaniel.architectury.Architectury;
-import me.shedaniel.architectury.event.events.client.ClientLifecycleEvent;
-import me.shedaniel.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.client.ClientTickEvent;
 import net.blancworks.figura.customization.avatar.FiguraAvatar;
 import net.blancworks.figura.customization.avatar.FiguraAvatarManager;
 import net.blancworks.figura.lua.FiguraLuaManager;
-import net.blancworks.figura.network.FiguraNetworkHandler;
 import net.blancworks.figura.network.FiguraNetworkManager;
 
 import java.util.UUID;

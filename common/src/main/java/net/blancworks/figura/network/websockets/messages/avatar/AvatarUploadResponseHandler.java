@@ -1,11 +1,7 @@
 package net.blancworks.figura.network.websockets.messages.avatar;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.network.FiguraNetworkManager;
 import net.blancworks.figura.network.websockets.messages.MessageHandler;
-import net.blancworks.figura.network.websockets.messages.pubsub.ChannelAvatarUpdateMessageSender;
-import net.blancworks.figura.network.websockets.messages.user.UserSetAvatarMessageSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.LiteralText;

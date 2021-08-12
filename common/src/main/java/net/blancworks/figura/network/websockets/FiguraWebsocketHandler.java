@@ -4,8 +4,6 @@ import com.google.common.io.ByteSource;
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
 import com.neovisionaries.ws.client.*;
-import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.network.FiguraNetworkManager;
 import net.blancworks.figura.network.handlers.BackendNetworkHandler;
 import net.blancworks.figura.network.websockets.messages.MessageHandler;
 import net.blancworks.figura.network.websockets.messages.MessageRegistry;
@@ -16,7 +14,6 @@ import net.blancworks.figura.network.websockets.messages.pubsub.ChannelAvatarUpd
 import net.blancworks.figura.network.websockets.messages.user.UserAvatarHashProvideResponseHandler;
 import net.blancworks.figura.network.websockets.messages.user.UserAvatarProvideResponseHandler;
 import net.blancworks.figura.network.websockets.messages.utility.ErrorMessageHandler;
-
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;

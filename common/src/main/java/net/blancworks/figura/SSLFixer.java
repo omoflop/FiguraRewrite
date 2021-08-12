@@ -1,8 +1,5 @@
 package net.blancworks.figura;
 
-import net.blancworks.figura.lua.FiguraLuaManager;
-import net.fabricmc.loader.api.FabricLoader;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManagerFactory;
@@ -74,13 +71,13 @@ public class SSLFixer {
 
     public static void main() throws IOException {
         // signed by default trusted CAs.
-        testUrl(new URL("https://google.com"));
-        testUrl(new URL("https://www.thawte.com"));
+        //testUrl(new URL("https://google.com"));
+        //testUrl(new URL("https://www.thawte.com"));
 
         // signed by letsencrypt
-        testUrl(new URL("https://helloworld.letsencrypt.org"));
+        //testUrl(new URL("https://helloworld.letsencrypt.org"));
         // signed by LE's cross-sign CA
-        testUrl(new URL("https://letsencrypt.org"));
+        //testUrl(new URL("https://letsencrypt.org"));
         // expired
         //testUrl(new URL("https://tv.eurosport.com/"));
         // self-signed

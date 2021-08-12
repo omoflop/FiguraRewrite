@@ -2,8 +2,6 @@ package net.blancworks.figura.customization.avatar.model;
 
 import net.blancworks.figura.customization.avatar.FiguraAvatar;
 import net.blancworks.figura.customization.avatar.model.parts.FiguraModelPart;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.ArrayList;

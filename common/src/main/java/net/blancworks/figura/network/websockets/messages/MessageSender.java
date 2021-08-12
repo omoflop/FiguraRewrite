@@ -2,7 +2,6 @@ package net.blancworks.figura.network.websockets.messages;
 
 import com.google.common.io.LittleEndianDataOutputStream;
 import com.neovisionaries.ws.client.WebSocket;
-import net.blancworks.figura.network.FiguraNetworkManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

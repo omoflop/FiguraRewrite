@@ -2,27 +2,24 @@ package net.blancworks.figura.network.handlers;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketFactory;
-import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.network.FiguraNetworkHandler;
 import net.blancworks.figura.network.FiguraNetworkManager;
 import net.blancworks.figura.network.websockets.FiguraWebsocketHandler;
 import net.blancworks.figura.network.websockets.messages.MessageRegistry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.Address;
+import net.minecraft.client.network.AllowedAddressResolver;
 import net.minecraft.client.network.ClientLoginNetworkHandler;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkState;
 import net.minecraft.network.packet.c2s.handshake.HandshakeC2SPacket;
 import net.minecraft.network.packet.c2s.login.LoginHelloC2SPacket;
-import net.minecraft.network.packet.s2c.login.LoginDisconnectS2CPacket;
 import net.minecraft.text.Text;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Date;
+import java.net.InetSocketAddress;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -176,9 +173,9 @@ public class BackendNetworkHandler extends FiguraNetworkHandler {
      */
     private CompletableFuture backendAuth() throws Exception {
         String address = authServerURL();
-        InetAddress inetAddress = InetAddress.getByName(address);
+        InetSocketAddress inetAddress = new InetSocketAddress(address, 25565);
 
-        ClientConnection connection = ClientConnection.connect(inetAddress, 25565, true);
+        ClientConnection connection = ClientConnection.connect(inetAddress, true);
 
         CompletableFuture<String> disconnectedFuture = new CompletableFuture<>();
 

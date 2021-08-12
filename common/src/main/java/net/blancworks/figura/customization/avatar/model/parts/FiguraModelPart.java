@@ -2,7 +2,6 @@ package net.blancworks.figura.customization.avatar.model.parts;
 
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import net.blancworks.figura.customization.avatar.model.FiguraModel;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
