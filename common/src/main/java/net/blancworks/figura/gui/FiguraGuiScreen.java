@@ -1,9 +1,14 @@
 package net.blancworks.figura.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.gui.panels.FiguraMainPanel;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 /**
  * This is the generic, top-level screen that's used in minecraft itself for the menu.
@@ -17,6 +22,8 @@ public class FiguraGuiScreen extends Screen {
     public FiguraPanel currentPanel;
 
     public FiguraMainPanel mainPanel = new FiguraMainPanel(this);
+    
+    public final FiguraGUIFramebuffer guiFramebuffer = new FiguraGUIFramebuffer();
 
     public FiguraGuiScreen(Screen parentScreen) {
         super(new TranslatableText("gui.figura.mainpanel"));
@@ -35,7 +42,22 @@ public class FiguraGuiScreen extends Screen {
     public void render(MatrixStack matrixStack, int i, int j, float f) {
         super.render(matrixStack, i, j, f);
 
+        guiFramebuffer.setSize(MinecraftClient.getInstance().getWindow().getWidth(), MinecraftClient.getInstance().getWindow().getHeight());
+
+
+        GL30.glEnable(GL30.GL_STENCIL_TEST);
+        GL30.glStencilMask(0xFF);
+        GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, guiFramebuffer.getFbo());
+        GlStateManager._clearStencil(0);
+        GlStateManager._clearColor(0,0,0,0);
+        GlStateManager._clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT, false);
+
+
         if (currentPanel != null) currentPanel.render(matrixStack, i, j, f);
+        
+        GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, MinecraftClient.getInstance().getFramebuffer().fbo);
+        
+        guiFramebuffer.drawToScreen(matrixStack, width, height);
     }
 
     @Override
