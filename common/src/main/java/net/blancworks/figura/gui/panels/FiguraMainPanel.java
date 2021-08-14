@@ -15,7 +15,9 @@ public class FiguraMainPanel extends FiguraPanel {
         super(screen);
 
         card1 = new CardElement(CardElement.CardBackground.BLUE, new LiteralText("Bunny"), new LiteralText("Fran"));
+        card1.stencilLayerID = 10;
         card2 = new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Bunny"), new LiteralText("Fran"));
+        card2.stencilLayerID = 15;
     }
 
     @Override

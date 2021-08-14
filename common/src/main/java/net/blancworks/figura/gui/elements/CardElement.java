@@ -59,9 +59,6 @@ public class CardElement extends StencilElement {
         matrixStack.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion((-mouseX / MinecraftClient.getInstance().getWindow().getWidth()) * 120));
 
         try {
-
-            stencilLayerID = 35;
-
             //Draw the main body of the card
             /*{
              MinecraftClient.getInstance().getTextureManager().bindTexture(textureID);
@@ -96,7 +93,7 @@ public class CardElement extends StencilElement {
                 bufferBuilder.vertex(matrixStack.peek().getModel(), 0, 0, 0).color(255, 0, 0, 255).texture(0, 0).next();
 
                 bufferBuilder.end();
-                setupStencilPrep();
+                setupStencilWrite();
                 BufferRenderer.draw(bufferBuilder);
             }
 
@@ -117,7 +114,7 @@ public class CardElement extends StencilElement {
 
                 bufferBuilder.end();
                 GlStateManager._clear(GL11.GL_DEPTH_BUFFER_BIT, false);
-                setupStencil();
+                setupStencilTest();
                 BufferRenderer.draw(bufferBuilder);
                 RenderSystem.enableDepthTest();
 
@@ -157,7 +154,6 @@ public class CardElement extends StencilElement {
         RenderSystem.defaultBlendFunc();
 
         matrixStack.pop();
-        resetStencil();
     }
 
     @Override

@@ -8,33 +8,36 @@ import org.lwjgl.opengl.GL30;
 public abstract class StencilElement extends FiguraGuiElement{
     
     public int stencilLayerID = 1;
-    
-    public void setupStencilPrep(){
-        
+
+    /**
+     * Sets the current rendering state to draw to this card's stencil ID.
+     *
+     * Every pixel drawn in this rendering mode is set to the stencil layer ID.
+     */
+    public void setupStencilWrite(){
+        //Allow writing to stencil buffer
+        GlStateManager._stencilMask(0xFF);
+
         //Stencil fail = keep (never happens)
         //Depth fail = keep
         //Both success = replace with layer ID
         GlStateManager._stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE);
 
         //Always write the stencil ID for drawing prep phase.
-        GlStateManager._stencilFunc(GL11.GL_ALWAYS, stencilLayerID, 255);
+        GlStateManager._stencilFunc(GL11.GL_ALWAYS, stencilLayerID, 0xff);
     }
 
-    public void setupStencil(){
+    /**
+     * Sets the current rendering state to test all geometry against this card's stencil ID.
+     *
+     * If the pixel at a given location doesn't match the stencil ID, the pixel does not draw.
+     */
+    public void setupStencilTest(){
+        //Turn off writing to stecil buffer, we're only testing against it here.
         GlStateManager._stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
-        GL30.glStencilMask(0x00);
+        GlStateManager._stencilMask(0x00);
         
         //Test against the stencil layer ID.
-        GlStateManager._stencilFunc(GL11.GL_EQUAL, stencilLayerID, 255);
-    }
-    
-    public void resetStencil(){
-        //Clear stencil buffer now that we're done rendering this stencil element
-        //GlStateManager.clear(GL11.GL_STENCIL_BUFFER_BIT, false);
-        
-        GlStateManager._enableDepthTest();
-        GlStateManager._stencilFunc(GL11.GL_EQUAL, 0, 255);
-        //GlStateManager._stencilMask(0x00);
-        GL30.glDisable(GL30.GL_STENCIL_TEST);
+        GlStateManager._stencilFunc(GL11.GL_EQUAL, stencilLayerID, 0xff);
     }
 }
