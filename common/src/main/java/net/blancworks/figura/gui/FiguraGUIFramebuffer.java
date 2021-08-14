@@ -43,7 +43,8 @@ public class FiguraGUIFramebuffer {
         
         //Minimized window, we don't even need the framebuffer, so...
         if(nWidth == 0 || nHeight == 0)
-        
+            return;
+            
         if (nWidth != width || nHeight != height) {
             width = nWidth;
             height = nHeight;
