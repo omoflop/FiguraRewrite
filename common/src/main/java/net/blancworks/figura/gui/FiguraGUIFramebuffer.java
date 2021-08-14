@@ -40,10 +40,27 @@ public class FiguraGUIFramebuffer {
      * @param nHeight The new height
      */
     public void setSize(int nWidth, int nHeight) {
+        
+        //Minimized window, we don't even need the framebuffer, so...
+        if(nWidth == 0 || nHeight == 0)
+        
         if (nWidth != width || nHeight != height) {
             width = nWidth;
             height = nHeight;
 
+            if(this.fbo != -1){
+                GlStateManager._glDeleteFramebuffers(this.fbo);
+                fbo = -1;
+            }
+            if(this.colorAttachment != -1){
+                TextureUtil.releaseTextureId(this.colorAttachment);
+                this.colorAttachment = -1;
+            }
+            if(this.depthStencilAttachment != -1){
+                TextureUtil.releaseTextureId(this.depthStencilAttachment);
+                this.depthStencilAttachment = -1;
+            }
+            
             this.fbo = GlStateManager.glGenFramebuffers();
             this.colorAttachment = TextureUtil.generateTextureId();
             this.depthStencilAttachment = TextureUtil.generateTextureId();
