@@ -12,11 +12,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
+import org.lwjgl.opengl.GL30;
 
 public class CardElement extends StencilElement {
 
     public final Identifier BACKGROUND;
     public final Identifier BACKGROUND_OVERLAY = new Identifier("figura", "textures/cards/background_overlay.png");
+    public final Identifier BACK = new Identifier("figura", "textures/cards/back.png");
     public final Text NAME;
     public final Text AUTHOR;
     public final LivingEntity ENTITY;
@@ -57,19 +59,19 @@ public class CardElement extends StencilElement {
 
         matrixStack.translate(150, 150, 0);
 
-        Vec2f rotation = new Vec2f(((-mouseY / MinecraftClient.getInstance().getWindow().getHeight()) * 120), (-mouseX / MinecraftClient.getInstance().getWindow().getWidth()) * 120);
+        Vec2f rotation = new Vec2f(((-mouseY / MinecraftClient.getInstance().getWindow().getHeight()) * 150), (-mouseX / MinecraftClient.getInstance().getWindow().getWidth()) * 150);
         matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(rotation.x));
         matrixStack.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(rotation.y));
 
-        //reset render properties
-        RenderSystem.disableBlend();
-        RenderSystem.disableDepthTest();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         try {
             //center rotation
             matrixStack.push();
             matrixStack.translate(-32, -48, 0);
+
+            //enable stencil
+            GL30.glEnable(GL30.GL_STENCIL_TEST);
 
             //Prepare stencil by drawing an object where we want the card "viewport" to be
             {
@@ -78,28 +80,25 @@ public class CardElement extends StencilElement {
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,  96, 0).color(255, 0, 0, 255).texture(0, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 64, 96, 0).color(255, 0, 0, 255).texture(1, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 64,  0, 0).color(255, 0, 0, 255).texture(1, 0).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,   0, 0).color(255, 0, 0, 255).texture(0, 0).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,  96, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 1).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 64, 96, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 1).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 64,  0, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 0).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,   0, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 0).next();
 
                 bufferBuilder.end();
                 setupStencilWrite();
                 BufferRenderer.draw(bufferBuilder);
             }
 
-            //Draw the card art here
+            //stencil allowed area
             {
-                //stencil magic
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,  96, 0).color(0, 255, 0, 0).texture(0, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 64, 96, 0).color(0, 255, 0, 0).texture(1, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 64,  0, 0).color(0, 255, 0, 0).texture(1, 0).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,   0, 0).color(0, 255, 0, 0).texture(0, 0).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(),0,  96, 0).color(0, 0xff, 0, 0).texture(0, 1).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(),64, 96, 0).color(0, 0xff, 0, 0).texture(1, 1).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(),64,  0, 0).color(0, 0xff, 0, 0).texture(1, 0).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(),0,   0, 0).color(0, 0xff, 0, 0).texture(0, 0).next();
 
                 bufferBuilder.end();
                 setupStencilTest();
@@ -124,10 +123,24 @@ public class CardElement extends StencilElement {
 
                 matrixStack.push();
                 matrixStack.translate(0, 0, -16);
-                drawEntity(32, 48, 30, rotation.y, rotation.x, ENTITY, matrixStack);
+                drawEntity(32, 48, 30, rotation.x, rotation.y, ENTITY, matrixStack);
                 matrixStack.pop();
 
                 RenderSystem.disableDepthTest();
+            }
+
+            //disable stencil
+            GL30.glDisable(GL30.GL_STENCIL_TEST);
+
+            //render back art
+            {
+                RenderSystem.setShaderTexture(0, BACK);
+
+                matrixStack.push();
+                matrixStack.translate(64f, 0f,0f);
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
+                drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
+                matrixStack.pop();
             }
 
             //render overlay
@@ -174,43 +187,63 @@ public class CardElement extends StencilElement {
 
     }
 
-    public static void drawEntity(int x, int y, int scale, float yaw, float pitch, LivingEntity livingEntity, MatrixStack matrixStack) {
-        float h = (float)Math.atan(yaw / 40f);
-        float l = (float)Math.atan(pitch / 40f);
+    public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity livingEntity, MatrixStack matrixStack) {
+        //rotation
+        float h = Float.isNaN(yaw) ? 0f : (float) Math.atan(yaw / 40f);
+        float l = Float.isNaN(pitch) ? 0f : (float) Math.atan(pitch / 40f);
+
+        //apply matrix transformers
         matrixStack.push();
         matrixStack.translate(x, y, 0);
         matrixStack.scale(1f, 1f, -1f);
-        matrixStack.translate(0d, 0d, 0d);
         matrixStack.scale((float) scale, (float) scale, (float) scale);
+
         Quaternion quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180f);
-        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(l * 20f);
+        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(0f);
         quaternion.hamiltonProduct(quaternion2);
         matrixStack.multiply(quaternion);
-        float m = livingEntity.bodyYaw;
-        float n = livingEntity.getYaw();
-        float o = livingEntity.getPitch();
-        float p = livingEntity.prevHeadYaw;
-        float q = livingEntity.headYaw;
+        quaternion2.conjugate();
+
+        //backup entity variables
+        float bodyYaw = livingEntity.bodyYaw;
+        float entityYaw = livingEntity.getYaw();
+        float entityPitch = livingEntity.getPitch();
+        float prevHeadYaw = livingEntity.prevHeadYaw;
+        float headYaw = livingEntity.headYaw;
+
+        //apply entity rotation
         livingEntity.bodyYaw = 180f + h * 20f;
         livingEntity.setYaw(180f + h * 40f);
         livingEntity.setPitch(-l * 20f);
         livingEntity.headYaw = livingEntity.getYaw();
         livingEntity.prevHeadYaw = livingEntity.getYaw();
-        //RenderSystem.setShaderLights(Vec3f.ZERO, Vec3f.ZERO);
-        DiffuseLighting.method_34742();
+
+        //setup entity renderer
+        RenderSystem.setShaderLights(Vec3f.ZERO, Vec3f.ZERO);
+        //DiffuseLighting.method_34742();
         EntityRenderDispatcher entityRenderDispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
-        quaternion2.conjugate();
-        entityRenderDispatcher.setRotation(quaternion2);
+        boolean renderHitboxes = entityRenderDispatcher.shouldRenderHitboxes();
+        entityRenderDispatcher.setRenderHitboxes(false);
         entityRenderDispatcher.setRenderShadows(false);
+        entityRenderDispatcher.setRotation(quaternion2);
         VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+
+        //render
         RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(livingEntity, 0d, -1d, 0d, 0f, 1f, matrixStack, immediate, 0xf000f0));
         immediate.draw();
+
+        //restore entity rendering data
+        entityRenderDispatcher.setRenderHitboxes(renderHitboxes);
         entityRenderDispatcher.setRenderShadows(true);
-        livingEntity.bodyYaw = m;
-        livingEntity.setYaw(n);
-        livingEntity.setPitch(o);
-        livingEntity.prevHeadYaw = p;
-        livingEntity.headYaw = q;
+
+        //restore entity data
+        livingEntity.bodyYaw = bodyYaw;
+        livingEntity.setYaw(entityYaw);
+        livingEntity.setPitch(entityPitch);
+        livingEntity.prevHeadYaw = prevHeadYaw;
+        livingEntity.headYaw = headYaw;
+
+        //pop matrix
         matrixStack.pop();
         DiffuseLighting.enableGuiDepthLighting();
     }

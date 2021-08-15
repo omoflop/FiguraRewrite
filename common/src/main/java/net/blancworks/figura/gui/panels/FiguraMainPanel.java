@@ -7,7 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.passive.RabbitEntity;
 import net.minecraft.text.LiteralText;
 
@@ -25,7 +25,7 @@ public class FiguraMainPanel extends FiguraPanel {
         entity1.setRabbitType(99);
 
         cards.add(new CardElement(CardElement.CardBackground.BLUE, new LiteralText("Booni"), new LiteralText("Fran"), entity1, 10));
-        cards.add(new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Dragon"), new LiteralText("Fran"), new EnderDragonEntity(EntityType.ENDER_DRAGON, world), 15));
+        cards.add(new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Axolotl"), new LiteralText("Fran"), new AxolotlEntity(EntityType.AXOLOTL, world), 15));
         cards.add(new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Me!"), new LiteralText("Fran"), MinecraftClient.getInstance().player, 20));
     }
 
