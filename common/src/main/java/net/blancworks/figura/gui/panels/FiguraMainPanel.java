@@ -3,34 +3,41 @@ package net.blancworks.figura.gui.panels;
 import net.blancworks.figura.gui.FiguraGuiScreen;
 import net.blancworks.figura.gui.FiguraPanel;
 import net.blancworks.figura.gui.elements.CardElement;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.passive.AxolotlEntity;
+import net.minecraft.entity.passive.RabbitEntity;
 import net.minecraft.text.LiteralText;
+
+import java.util.ArrayList;
 
 public class FiguraMainPanel extends FiguraPanel {
 
-    public CardElement card1;
-    public CardElement card2;
+    public ArrayList<CardElement> cards = new ArrayList<>();
 
     public FiguraMainPanel(FiguraGuiScreen screen) {
         super(screen);
 
-        card1 = new CardElement(CardElement.CardBackground.BLUE, new LiteralText("Bunny"), new LiteralText("Fran"));
-        card1.stencilLayerID = 10;
-        card2 = new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Bunny"), new LiteralText("Fran"));
-        card2.stencilLayerID = 15;
+        ClientWorld world = MinecraftClient.getInstance().world;
+        RabbitEntity entity1 = new RabbitEntity(EntityType.RABBIT, world);
+        entity1.setRabbitType(99);
+
+        cards.add(new CardElement(CardElement.CardBackground.BLUE, new LiteralText("Booni"), new LiteralText("Fran"), entity1, 10));
+        cards.add(new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Axolotl"), new LiteralText("Fran"), new AxolotlEntity(EntityType.AXOLOTL, world), 15));
+        cards.add(new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Me!"), new LiteralText("Fran"), MinecraftClient.getInstance().player, 20));
     }
 
     @Override
     public void render(MatrixStack matrixStack, int i, int j, float f) {
         super.render(matrixStack, i, j, f);
 
-        matrixStack.push();
-        card1.render(matrixStack, i, j, f);
-        matrixStack.pop();
-
-        matrixStack.push();
-        matrixStack.translate(100, 0, 0);
-        card2.render(matrixStack, i, j, f);
-        matrixStack.pop();
+        for (int k = 0, x = 0; k < cards.size(); k++, x += 100) {
+            matrixStack.push();
+            matrixStack.translate(x, 0, 0);
+            cards.get(k).render(matrixStack, i, j, f);
+            matrixStack.pop();
+        }
     }
 }
