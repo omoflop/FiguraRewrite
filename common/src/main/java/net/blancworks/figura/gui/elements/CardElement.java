@@ -71,10 +71,12 @@ public class CardElement extends StencilElement {
             matrixStack.translate(-32, -48, 0);
 
             //enable stencil
-            GL30.glEnable(GL30.GL_STENCIL_TEST);
+            //GL30.glEnable(GL30.GL_STENCIL_TEST);
 
             //Prepare stencil by drawing an object where we want the card "viewport" to be
             {
+                setupStencilWrite();
+
                 RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
@@ -86,13 +88,15 @@ public class CardElement extends StencilElement {
                 bufferBuilder.vertex(matrixStack.peek().getModel(), 0,   0, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 0).next();
 
                 bufferBuilder.end();
-                setupStencilWrite();
                 BufferRenderer.draw(bufferBuilder);
             }
 
+            //From here on out, we aren't allowed to draw pixels outside the viewport we created above ^
+            setupStencilTest();
+
             //stencil allowed area
             {
-                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+                /*BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
                 bufferBuilder.vertex(matrixStack.peek().getModel(),0,  96, 0).color(0, 0xff, 0, 0).texture(0, 1).next();
@@ -100,9 +104,8 @@ public class CardElement extends StencilElement {
                 bufferBuilder.vertex(matrixStack.peek().getModel(),64,  0, 0).color(0, 0xff, 0, 0).texture(1, 0).next();
                 bufferBuilder.vertex(matrixStack.peek().getModel(),0,   0, 0).color(0, 0xff, 0, 0).texture(0, 0).next();
 
-                bufferBuilder.end();
-                setupStencilTest();
-                BufferRenderer.draw(bufferBuilder);
+                bufferBuilder.end();*/
+                //BufferRenderer.draw(bufferBuilder);
             }
 
             //background
@@ -110,7 +113,7 @@ public class CardElement extends StencilElement {
                 RenderSystem.setShaderTexture(0, BACKGROUND);
 
                 matrixStack.push();
-                matrixStack.translate(-16, -24, 16);
+                matrixStack.translate(-16, -24, -100);
                 matrixStack.scale(1.5f, 1.5f, 1.5f);
                 //matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height
                 drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
@@ -130,7 +133,12 @@ public class CardElement extends StencilElement {
             }
 
             //disable stencil
-            GL30.glDisable(GL30.GL_STENCIL_TEST);
+            //GL30.glDisable(GL30.GL_STENCIL_TEST);
+
+            //After this point, the stencil buffer is *effectively* turned off.
+            //No values will be written to the stencil buffer, and all objects will render
+            //regardless of what's in the buffer.
+            resetStencilState();
 
             //render back art
             {
@@ -139,7 +147,7 @@ public class CardElement extends StencilElement {
                 matrixStack.push();
                 matrixStack.translate(64f, 0f,0f);
                 matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
-                drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
+                //drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
                 matrixStack.pop();
             }
 
@@ -158,13 +166,13 @@ public class CardElement extends StencilElement {
             {
                 //name
                 matrixStack.push();
-                matrixStack.translate(3f, 3f,0f); //3px offset
+                matrixStack.translate(3f, 3f,5.0f); //3px offset
                 drawTextWithShadow(matrixStack, client.textRenderer, NAME, 0, 0, 0xffffff);
                 matrixStack.pop();
 
                 //author
                 matrixStack.push();
-                matrixStack.translate(3f, 11f,0f); //3px offset + 7px above text + 1px spacing
+                matrixStack.translate(3f, 11f,5.0f); //3px offset + 7px above text + 1px spacing
                 matrixStack.scale(0.75f, 0.75f,1f);
                 drawTextWithShadow(matrixStack, client.textRenderer, AUTHOR, 0, 0, 0xffffff);
                 matrixStack.pop();

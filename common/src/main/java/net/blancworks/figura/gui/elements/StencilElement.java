@@ -40,4 +40,16 @@ public abstract class StencilElement extends FiguraGuiElement{
         //Test against the stencil layer ID.
         GlStateManager._stencilFunc(GL11.GL_EQUAL, stencilLayerID, 0xff);
     }
+
+    /**
+     * Turns "off" stencil testing without actually disabling it.
+     */
+    public void resetStencilState(){
+        //Turn off writing to stecil buffer.
+        GlStateManager._stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
+        GlStateManager._stencilMask(0x00);
+
+        //Always succeed in the stencil test, no matter what.
+        GlStateManager._stencilFunc(GL11.GL_ALWAYS, 0, 0xff);
+    }
 }
