@@ -42,19 +42,25 @@ public class FiguraGuiScreen extends Screen {
     public void render(MatrixStack matrixStack, int i, int j, float f) {
         super.render(matrixStack, i, j, f);
 
-        guiFramebuffer.setSize(MinecraftClient.getInstance().getWindow().getWidth(), MinecraftClient.getInstance().getWindow().getHeight());
+        int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
+        int windowHeight = MinecraftClient.getInstance().getWindow().getHeight();
+        guiFramebuffer.setSize(windowWidth, windowHeight);
 
 
         //Enable stencil buffer during this phase of rendering
         GL30.glEnable(GL30.GL_STENCIL_TEST);
-        GL30.glStencilMask(0xFF);
+        GlStateManager._stencilMask(0xFF);
         //Bind custom GUI framebuffer to be used for rendering
         GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, guiFramebuffer.getFbo());
 
         //Clear GUI framebuffer
         GlStateManager._clearStencil(0);
-        GlStateManager._clearColor(0,0,0,0);
+        GlStateManager._clearColor(0,0,0,1.0F);
         GlStateManager._clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT, false);
+
+        RenderSystem.backupProjectionMatrix();
+        MinecraftClient.getInstance().getFramebuffer().draw(windowWidth,windowHeight,false);
+        RenderSystem.restoreProjectionMatrix();
 
         if (currentPanel != null) currentPanel.render(matrixStack, i, j, f);
 

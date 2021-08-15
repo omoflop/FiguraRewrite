@@ -82,10 +82,10 @@ public class CardElement extends StencilElement {
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,  96, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 64, 96, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 64,  0, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 0).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 0,   0, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 0).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 2,  94, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 1).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 62, 94, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 1).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 62,  2, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 0).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(), 2,   2, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 0).next();
 
                 bufferBuilder.end();
                 BufferRenderer.draw(bufferBuilder);
@@ -126,7 +126,7 @@ public class CardElement extends StencilElement {
 
                 matrixStack.push();
                 matrixStack.translate(0, 0, -16);
-                drawEntity(32, 48, 30, rotation.x, rotation.y, ENTITY, matrixStack);
+                drawEntity(32, 48, 30, 0, 0, ENTITY, matrixStack);
                 matrixStack.pop();
 
                 RenderSystem.disableDepthTest();
@@ -147,7 +147,7 @@ public class CardElement extends StencilElement {
                 matrixStack.push();
                 matrixStack.translate(64f, 0f,0f);
                 matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
-                //drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
+                drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
                 matrixStack.pop();
             }
 
