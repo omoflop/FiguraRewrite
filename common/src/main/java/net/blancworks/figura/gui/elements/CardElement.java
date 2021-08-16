@@ -15,38 +15,55 @@ import net.minecraft.util.math.Vec3f;
 
 public class CardElement extends StencilElement {
 
-    public final Identifier BACKGROUND;
-    public final Identifier BACKGROUND_OVERLAY = new Identifier("figura", "textures/cards/background_overlay.png");
-    public final Identifier BACK = new Identifier("figura", "textures/cards/back.png");
-    public final Text NAME;
-    public final Text AUTHOR;
-    public final LivingEntity ENTITY;
+    public static final Identifier BACK_ART = new Identifier("figura", "textures/cards/back.png");
+
+    public final CardBackground background;
+    public final Identifier backgroundOverlay = new Identifier("figura", "textures/cards/background_overlay.png");
+    public final Text name;
+    public final Text author;
+    public final LivingEntity entity;
 
     public MinecraftClient client;
 
     public CardElement(CardBackground background, Text name, Text author, LivingEntity entity, int stencilLayerID) {
-        this.BACKGROUND = new Identifier(background.namespace, background.path);
-        this.NAME = name;
-        this.AUTHOR = author;
-        this.ENTITY = entity;
+        this.background = background;
+        this.name = name;
+        this.author = author;
+        this.entity = entity;
 
         this.client = MinecraftClient.getInstance();
         this.stencilLayerID = stencilLayerID;
     }
 
     public enum CardBackground {
-        DEBUG("figura", "textures/cards/backgrounds/debug.png"),
-        BLUE("figura", "textures/cards/backgrounds/blue.png"),
-        CLOUDS("figura", "textures/cards/backgrounds/clouds.png"),
-        FADE("figura", "textures/cards/backgrounds/fade.png"),
-        FLAMES("figura", "textures/cards/backgrounds/flames.png"),
-        SPACE("figura", "textures/cards/backgrounds/space.png");
+        DEBUG(new Identifier("figura", "textures/cards/backgrounds/debug.png")),
+        BLUE(new Identifier("figura", "textures/cards/backgrounds/blue.png")),
+        CLOUDS(
+                new Identifier("figura", "textures/cards/backgrounds/clouds/background.png"),
+                new Identifier("figura", "textures/cards/backgrounds/clouds/stars.png"),
+                new Identifier("figura", "textures/cards/backgrounds/clouds/clouds.png")
+        ),
+        FADE(new Identifier("figura", "textures/cards/backgrounds/fade.png")),
+        FLAMES(new Identifier("figura", "textures/cards/backgrounds/flames.png")),
+        SPACE(
+                new Identifier("figura", "textures/cards/backgrounds/space/background.png"),
+                new Identifier("figura", "textures/cards/backgrounds/space/stars.png")
+        );
 
-        public final String namespace;
-        public final String path;
-        CardBackground(String namespace, String path) {
-            this.namespace = namespace;
-            this.path = path;
+        public final Identifier[] ids;
+        CardBackground(Identifier... ids) {
+            this.ids = ids;
+        }
+    }
+
+    public enum CardEffects {
+        LINES(new Identifier("figura", "lines"), new Identifier("figura", "textures/cards/effects/lines.png"));
+
+        public final Identifier id;
+        public final Identifier texture;
+        CardEffects(Identifier id, Identifier texture) {
+            this.id = id;
+            this.texture = texture;
         }
     }
 
@@ -95,48 +112,7 @@ public class CardElement extends StencilElement {
             setupStencilTest();
 
             //background
-            {
-                //prepare background
-                RenderSystem.setShaderTexture(0, BACKGROUND);
-                matrixStack.push();
-                matrixStack.translate(-16, -24, -96);
-                matrixStack.scale(1.5f, 1.5f, 1.5f);
-
-                //drawTexture(matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height)
-
-                //back
-                drawTexture(matrixStack, 0, 0, 64, 96, 64, 64, 64, 96, 192, 160);
-
-                //left
-                matrixStack.push();
-                matrixStack.translate(0f, 0f, 64f);
-                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90f));
-                drawTexture(matrixStack, 0, 0, 64, 96, 0, 64, 64, 96, 192, 160);
-                matrixStack.pop();
-
-                //right
-                matrixStack.push();
-                matrixStack.translate(64f, 0f, 0f);
-                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-90f));
-                drawTexture(matrixStack, 0, 0, 64, 96, 128, 64, 64, 96, 192, 160);
-                matrixStack.pop();
-
-                //top
-                matrixStack.push();
-                matrixStack.translate(0f, 0f, 64f);
-                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90f));
-                drawTexture(matrixStack, 0, 0, 64, 64, 0, 0, 64, 64, 192, 160);
-                matrixStack.pop();
-
-                //bottom
-                matrixStack.push();
-                matrixStack.translate(0f, 96f, 0f);
-                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90f));
-                drawTexture(matrixStack, 0, 0, 64, 64, 64, 0, 64, 64, 192, 160);
-                matrixStack.pop();
-
-                matrixStack.pop();
-            }
+            renderBackground(matrixStack, background);
 
             //render model
             {
@@ -144,7 +120,7 @@ public class CardElement extends StencilElement {
 
                 matrixStack.push();
                 matrixStack.translate(0, 0, -15);
-                drawEntity(32, 48, 30, rotation.x, rotation.y, ENTITY, matrixStack);
+                drawEntity(32, 48, 30, rotation.x, rotation.y, entity, matrixStack);
                 matrixStack.pop();
 
                 RenderSystem.disableDepthTest();
@@ -157,7 +133,7 @@ public class CardElement extends StencilElement {
 
             //render back art
             {
-                RenderSystem.setShaderTexture(0, BACK);
+                RenderSystem.setShaderTexture(0, BACK_ART);
 
                 matrixStack.push();
                 matrixStack.translate(64f, 0f,0f);
@@ -170,9 +146,10 @@ public class CardElement extends StencilElement {
             {
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SrcFactor.DST_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-                RenderSystem.setShaderTexture(0, BACKGROUND_OVERLAY);
+                RenderSystem.setShaderTexture(0, backgroundOverlay);
 
                 matrixStack.push();
+                //drawTexture(matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height)
                 drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
                 matrixStack.pop();
             }
@@ -182,14 +159,14 @@ public class CardElement extends StencilElement {
                 //name
                 matrixStack.push();
                 matrixStack.translate(3f, 3f, 2f); //3px offset
-                drawTextWithShadow(matrixStack, client.textRenderer, NAME, 0, 0, 0xffffff);
+                drawTextWithShadow(matrixStack, client.textRenderer, name, 0, 0, 0xffffff);
                 matrixStack.pop();
 
                 //author
                 matrixStack.push();
                 matrixStack.translate(3f, 11f, 2f); //3px offset + 7px above text + 1px spacing
                 matrixStack.scale(0.75f, 0.75f,1f);
-                drawTextWithShadow(matrixStack, client.textRenderer, AUTHOR, 0, 0, 0xffffff);
+                drawTextWithShadow(matrixStack, client.textRenderer, author, 0, 0, 0xffffff);
                 matrixStack.pop();
             }
 
@@ -208,6 +185,59 @@ public class CardElement extends StencilElement {
     @Override
     public void tick() {
 
+    }
+
+    public static void renderBackground(MatrixStack matrixStack, CardBackground background) {
+        //prepare render
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.DST_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+
+        matrixStack.push();
+        matrixStack.translate(32f, 48f, 0f);
+        float scale = 1.5f;
+
+        for (int i = 0; i < background.ids.length; i++, scale -= 0.15f) {
+            //prepare background
+            RenderSystem.setShaderTexture(0, background.ids[i]);
+            matrixStack.push();
+            matrixStack.translate(-32f * scale, -48f * scale, -64f * scale);
+            matrixStack.scale(scale, scale, scale);
+
+            //back
+            drawTexture(matrixStack, 0, 0, 64, 96, 64, 64, 64, 96, 192, 160);
+
+            //left
+            matrixStack.push();
+            matrixStack.translate(0f, 0f, 64f);
+            matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90f));
+            drawTexture(matrixStack, 0, 0, 64, 96, 0, 64, 64, 96, 192, 160);
+            matrixStack.pop();
+
+            //right
+            matrixStack.push();
+            matrixStack.translate(64f, 0f, 0f);
+            matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-90f));
+            drawTexture(matrixStack, 0, 0, 64, 96, 128, 64, 64, 96, 192, 160);
+            matrixStack.pop();
+
+            //top
+            matrixStack.push();
+            matrixStack.translate(0f, 0f, 64f);
+            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90f));
+            drawTexture(matrixStack, 0, 0, 64, 64, 0, 0, 64, 64, 192, 160);
+            matrixStack.pop();
+
+            //bottom
+            matrixStack.push();
+            matrixStack.translate(0f, 96f, 0f);
+            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90f));
+            drawTexture(matrixStack, 0, 0, 64, 64, 64, 0, 64, 64, 192, 160);
+            matrixStack.pop();
+
+            matrixStack.pop();
+        }
+
+        matrixStack.pop();
     }
 
     public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity livingEntity, MatrixStack matrixStack) {
