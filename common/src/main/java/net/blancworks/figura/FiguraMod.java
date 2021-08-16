@@ -21,21 +21,18 @@ public class FiguraMod {
     public static void init() {
         mainTask = CompletableFuture.completedFuture(null);
 
-        
         //Run the SSL fixer to trust the backend's certificates.
         try {
             SSLFixer.main();
         } catch (Exception e){
           e.printStackTrace();  
         }
-        
+
         //Setup lua natives
         FiguraLuaManager.setupNativesForLua();
 
-        ClientTickEvent.CLIENT_POST.register((c)->{
-            FiguraNetworkManager.handler.tick();
-        });
-        
+        ClientTickEvent.CLIENT_POST.register((c)-> FiguraNetworkManager.handler.tick());
+
         FiguraAvatarManager.init();
     }
 
@@ -50,7 +47,6 @@ public class FiguraMod {
 
         return currAvatar;
     }
-
 
     /***
      * Sets up an asynchronous task to be done at some point in the future.
