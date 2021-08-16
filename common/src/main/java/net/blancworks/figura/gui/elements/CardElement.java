@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
-import org.lwjgl.opengl.GL30;
 
 public class CardElement extends StencilElement {
 
@@ -36,8 +35,12 @@ public class CardElement extends StencilElement {
     }
 
     public enum CardBackground {
+        DEBUG("figura", "textures/cards/backgrounds/debug.png"),
         BLUE("figura", "textures/cards/backgrounds/blue.png"),
-        CLOUDS("figura", "textures/cards/backgrounds/clouds.png");
+        CLOUDS("figura", "textures/cards/backgrounds/clouds.png"),
+        FADE("figura", "textures/cards/backgrounds/fade.png"),
+        FLAMES("figura", "textures/cards/backgrounds/flames.png"),
+        SPACE("figura", "textures/cards/backgrounds/space.png");
 
         public final String namespace;
         public final String path;
@@ -57,7 +60,7 @@ public class CardElement extends StencilElement {
         mouseX -= MinecraftClient.getInstance().getWindow().getWidth() / 2.0f;
         mouseY -= MinecraftClient.getInstance().getWindow().getHeight() / 2.0f;
 
-        matrixStack.translate(150, 150, 0);
+        matrixStack.translate(50, 150, 0);
 
         Vec2f rotation = new Vec2f(((-mouseY / MinecraftClient.getInstance().getWindow().getHeight()) * 150), (-mouseX / MinecraftClient.getInstance().getWindow().getWidth()) * 150);
         matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(rotation.x));
@@ -70,9 +73,6 @@ public class CardElement extends StencilElement {
             matrixStack.push();
             matrixStack.translate(-32, -48, 0);
 
-            //enable stencil
-            //GL30.glEnable(GL30.GL_STENCIL_TEST);
-
             //Prepare stencil by drawing an object where we want the card "viewport" to be
             {
                 setupStencilWrite();
@@ -82,10 +82,10 @@ public class CardElement extends StencilElement {
                 BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
                 bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 2,  94, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 1).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(),  2, 94, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 1).next();
                 bufferBuilder.vertex(matrixStack.peek().getModel(), 62, 94, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 1).next();
                 bufferBuilder.vertex(matrixStack.peek().getModel(), 62,  2, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 0).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 2,   2, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 0).next();
+                bufferBuilder.vertex(matrixStack.peek().getModel(),  2,  2, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 0).next();
 
                 bufferBuilder.end();
                 BufferRenderer.draw(bufferBuilder);
@@ -94,29 +94,47 @@ public class CardElement extends StencilElement {
             //From here on out, we aren't allowed to draw pixels outside the viewport we created above ^
             setupStencilTest();
 
-            //stencil allowed area
-            {
-                /*BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-                bufferBuilder.vertex(matrixStack.peek().getModel(),0,  96, 0).color(0, 0xff, 0, 0).texture(0, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(),64, 96, 0).color(0, 0xff, 0, 0).texture(1, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(),64,  0, 0).color(0, 0xff, 0, 0).texture(1, 0).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(),0,   0, 0).color(0, 0xff, 0, 0).texture(0, 0).next();
-
-                bufferBuilder.end();*/
-                //BufferRenderer.draw(bufferBuilder);
-            }
-
             //background
             {
+                //prepare background
                 RenderSystem.setShaderTexture(0, BACKGROUND);
-
                 matrixStack.push();
-                matrixStack.translate(-16, -24, -100);
+                matrixStack.translate(-16, -24, -96);
                 matrixStack.scale(1.5f, 1.5f, 1.5f);
-                //matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height
-                drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
+
+                //drawTexture(matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height)
+
+                //back
+                drawTexture(matrixStack, 0, 0, 64, 96, 64, 64, 64, 96, 192, 160);
+
+                //left
+                matrixStack.push();
+                matrixStack.translate(0f, 0f, 64f);
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90f));
+                drawTexture(matrixStack, 0, 0, 64, 96, 0, 64, 64, 96, 192, 160);
+                matrixStack.pop();
+
+                //right
+                matrixStack.push();
+                matrixStack.translate(64f, 0f, 0f);
+                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-90f));
+                drawTexture(matrixStack, 0, 0, 64, 96, 128, 64, 64, 96, 192, 160);
+                matrixStack.pop();
+
+                //top
+                matrixStack.push();
+                matrixStack.translate(0f, 0f, 64f);
+                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90f));
+                drawTexture(matrixStack, 0, 0, 64, 64, 0, 0, 64, 64, 192, 160);
+                matrixStack.pop();
+
+                //bottom
+                matrixStack.push();
+                matrixStack.translate(0f, 96f, 0f);
+                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90f));
+                drawTexture(matrixStack, 0, 0, 64, 64, 64, 0, 64, 64, 192, 160);
+                matrixStack.pop();
+
                 matrixStack.pop();
             }
 
@@ -125,15 +143,12 @@ public class CardElement extends StencilElement {
                 RenderSystem.enableDepthTest();
 
                 matrixStack.push();
-                matrixStack.translate(0, 0, -16);
-                drawEntity(32, 48, 30, 0, 0, ENTITY, matrixStack);
+                matrixStack.translate(0, 0, -15);
+                drawEntity(32, 48, 30, rotation.x, rotation.y, ENTITY, matrixStack);
                 matrixStack.pop();
 
                 RenderSystem.disableDepthTest();
             }
-
-            //disable stencil
-            //GL30.glDisable(GL30.GL_STENCIL_TEST);
 
             //After this point, the stencil buffer is *effectively* turned off.
             //No values will be written to the stencil buffer, and all objects will render
@@ -166,13 +181,13 @@ public class CardElement extends StencilElement {
             {
                 //name
                 matrixStack.push();
-                matrixStack.translate(3f, 3f,5.0f); //3px offset
+                matrixStack.translate(3f, 3f, 2f); //3px offset
                 drawTextWithShadow(matrixStack, client.textRenderer, NAME, 0, 0, 0xffffff);
                 matrixStack.pop();
 
                 //author
                 matrixStack.push();
-                matrixStack.translate(3f, 11f,5.0f); //3px offset + 7px above text + 1px spacing
+                matrixStack.translate(3f, 11f, 2f); //3px offset + 7px above text + 1px spacing
                 matrixStack.scale(0.75f, 0.75f,1f);
                 drawTextWithShadow(matrixStack, client.textRenderer, AUTHOR, 0, 0, 0xffffff);
                 matrixStack.pop();
