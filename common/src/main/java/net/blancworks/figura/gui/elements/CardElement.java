@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector2f;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -33,6 +34,8 @@ public class CardElement extends StencilElement {
 
         this.client = MinecraftClient.getInstance();
         this.stencilLayerID = stencilLayerID;
+
+        smoothingFactor = 0.1f;
     }
 
     public enum CardBackground {
@@ -69,19 +72,11 @@ public class CardElement extends StencilElement {
 
     @Override
     public void render(MatrixStack matrixStack, int i, int j, float f) {
+        super.render(matrixStack, i, j, f);
 
         matrixStack.push();
 
-        float mouseX = (float) MinecraftClient.getInstance().mouse.getX();
-        float mouseY = (float) MinecraftClient.getInstance().mouse.getY();
-        mouseX -= MinecraftClient.getInstance().getWindow().getWidth() / 2.0f;
-        mouseY -= MinecraftClient.getInstance().getWindow().getHeight() / 2.0f;
-
-        matrixStack.translate(50, 150, 0);
-
-        Vec2f rotation = new Vec2f(((-mouseY / MinecraftClient.getInstance().getWindow().getHeight()) * 150), (-mouseX / MinecraftClient.getInstance().getWindow().getWidth()) * 150);
-        matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(rotation.x));
-        matrixStack.multiply(Vec3f.NEGATIVE_Y.getDegreesQuaternion(rotation.y));
+        setupTransforms(matrixStack);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
@@ -120,7 +115,7 @@ public class CardElement extends StencilElement {
 
                 matrixStack.push();
                 matrixStack.translate(0, 0, -15);
-                drawEntity(32, 48, 30, rotation.x, rotation.y, entity, matrixStack);
+                drawEntity(32, 48, 30, 0, 0, entity, matrixStack);
                 matrixStack.pop();
 
                 RenderSystem.disableDepthTest();
@@ -136,7 +131,7 @@ public class CardElement extends StencilElement {
                 RenderSystem.setShaderTexture(0, BACK_ART);
 
                 matrixStack.push();
-                matrixStack.translate(64f, 0f,0f);
+                matrixStack.translate(64f, 0f, 0f);
                 matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
                 drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
                 matrixStack.pop();
@@ -238,7 +233,14 @@ public class CardElement extends StencilElement {
         }
 
         matrixStack.pop();
+
     }
+
+    @Override
+    public Vector2f getSize() {
+        return new Vector2f(64 * scaleCurrent.getX(), 94 * scaleCurrent.getY());
+    }
+
 
     public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity livingEntity, MatrixStack matrixStack) {
         //rotation

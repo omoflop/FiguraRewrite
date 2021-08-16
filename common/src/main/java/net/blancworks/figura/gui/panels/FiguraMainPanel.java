@@ -16,6 +16,9 @@ import net.minecraft.text.LiteralText;
 
 import java.util.ArrayList;
 
+/**
+ * Placeholder panel, not really a great name tbh
+ */
 public class FiguraMainPanel extends FiguraPanel {
 
     public ArrayList<CardElement> cards = new ArrayList<>();
@@ -39,11 +42,17 @@ public class FiguraMainPanel extends FiguraPanel {
     public void render(MatrixStack matrixStack, int i, int j, float f) {
         super.render(matrixStack, i, j, f);
 
+        matrixStack.push();
+        
+        matrixStack.translate(50, 150, 0);
+        
         for (int k = 0, x = 0; k < cards.size(); k++, x += 100) {
             matrixStack.push();
             matrixStack.translate(x, 0, 0);
             cards.get(k).render(matrixStack, i, j, f);
             matrixStack.pop();
         }
+        
+        matrixStack.pop();
     }
 }

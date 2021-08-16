@@ -3,6 +3,7 @@ package net.blancworks.figura.gui;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.gui.panels.FiguraMainPanel;
+import net.blancworks.figura.gui.panels.FiguraWardrobePanel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,13 +23,14 @@ public class FiguraGuiScreen extends Screen {
     public FiguraPanel currentPanel;
 
     public FiguraMainPanel mainPanel = new FiguraMainPanel(this);
+    public FiguraWardrobePanel wardrobePanel = new FiguraWardrobePanel(this);
     
     public final FiguraGUIFramebuffer guiFramebuffer = new FiguraGUIFramebuffer();
 
     public FiguraGuiScreen(Screen parentScreen) {
         super(new TranslatableText("gui.figura.mainpanel"));
 
-        switchToPanel(mainPanel);
+        switchToPanel(wardrobePanel);
     }
 
     public void switchToPanel(FiguraPanel newPanel) {
@@ -73,8 +75,10 @@ public class FiguraGuiScreen extends Screen {
         //Bind vanilla framebuffer again
         GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, MinecraftClient.getInstance().getFramebuffer().fbo);
 
+        RenderSystem.disableBlend();
         //Draw GUI framebuffer -> vanilla framebuffer
         guiFramebuffer.drawToScreen(matrixStack, width, height);
+        RenderSystem.enableBlend();
     }
 
     @Override
