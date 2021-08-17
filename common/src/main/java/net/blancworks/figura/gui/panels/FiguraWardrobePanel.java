@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector2f;
 import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3f;
 import org.apache.commons.io.FilenameUtils;
 
@@ -139,4 +140,8 @@ public class FiguraWardrobePanel extends FiguraPanel {
         }
     }
 
+    @Override
+    public Text getName() {
+        return new LiteralText("Wardrobe");
+    }
 }

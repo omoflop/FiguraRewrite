@@ -13,6 +13,7 @@ import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.passive.DolphinEntity;
 import net.minecraft.entity.passive.RabbitEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 
@@ -54,5 +55,10 @@ public class FiguraMainPanel extends FiguraPanel {
         }
         
         matrixStack.pop();
+    }
+
+    @Override
+    public Text getName() {
+        return new LiteralText("Main");
     }
 }
