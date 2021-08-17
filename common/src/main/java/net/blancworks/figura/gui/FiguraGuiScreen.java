@@ -160,6 +160,7 @@ public class FiguraGuiScreen extends Screen {
         stack.push();
 
         stack.translate(width / 2.0f, 20, 0);
+        stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-5));
 
         int currIndex = allPanels.indexOf(currentPanel);
 
