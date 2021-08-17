@@ -11,31 +11,31 @@ public class FiguraPanel {
 
     public FiguraGuiScreen screen;
 
-    public FiguraPanel(FiguraGuiScreen screen){
+    public FiguraPanel(FiguraGuiScreen screen) {
         this.screen = screen;
     }
 
-    public void render(MatrixStack matrixStack, int i, int j, float f){}
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {}
 
     public void tick() {}
 
-    public boolean mouseClicked(double d, double e, int i) {return false;}
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {return false;}
 
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {return false;}
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {return false;}
 
-    public boolean mouseReleased(double d, double e, int i) {return false;}
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {return false;}
 
-    public void mouseMoved(double d, double e) {}
+    public void mouseMoved(double mouseX, double mouseY) {}
 
-    public boolean mouseScrolled(double d, double e, double f){return false;}
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {return false;}
 
-    public boolean keyPressed(int i, int j, int k) {return false;}
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {return false;}
 
-    public boolean keyReleased(int i, int j, int k) {return false;}
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {return false;}
 
-    public void onLostFocus(FiguraPanel newPanel) { }
+    public void onLostFocus(FiguraPanel newPanel) {}
 
-    public void onGainedFocus(FiguraPanel oldPanel) { }
+    public void onGainedFocus(FiguraPanel oldPanel) {}
 
-    public Text getName(){ return new LiteralText("panel"); }
+    public Text getName() { return new LiteralText("panel"); }
 }

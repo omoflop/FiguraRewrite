@@ -5,18 +5,21 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector2f;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
 
 public class CardElement extends StencilElement {
 
     public static final Identifier BACK_ART = new Identifier("figura", "textures/cards/back.png");
+    public static final Identifier VIEWPORT = new Identifier("figura", "textures/cards/viewport.png");
+    public static SpriteAtlasTexture EFFECT_ATLAS_TEXTURE;
 
     public final CardBackground background;
     public final Identifier backgroundOverlay = new Identifier("figura", "textures/cards/background_overlay.png");
@@ -43,6 +46,7 @@ public class CardElement extends StencilElement {
         BLUE(new Identifier("figura", "textures/cards/backgrounds/blue.png")),
         CLOUDS(
                 new Identifier("figura", "textures/cards/backgrounds/clouds/background.png"),
+                new Identifier("figura", "textures/cards/backgrounds/clouds/moon.png"),
                 new Identifier("figura", "textures/cards/backgrounds/clouds/stars.png"),
                 new Identifier("figura", "textures/cards/backgrounds/clouds/clouds.png")
         ),
@@ -71,8 +75,8 @@ public class CardElement extends StencilElement {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int i, int j, float f) {
-        super.render(matrixStack, i, j, f);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+        super.render(matrixStack, mouseX, mouseY, delta);
 
         matrixStack.push();
 
@@ -89,18 +93,8 @@ public class CardElement extends StencilElement {
             {
                 setupStencilWrite();
 
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
-                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-                bufferBuilder.vertex(matrixStack.peek().getModel(),  2, 94, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 62, 94, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 1).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(), 62,  2, 0).color(0xff, 0x72, 0xb7, 0xff).texture(1, 0).next();
-                bufferBuilder.vertex(matrixStack.peek().getModel(),  2,  2, 0).color(0xff, 0x72, 0xb7, 0xff).texture(0, 0).next();
-
-                bufferBuilder.end();
-                BufferRenderer.draw(bufferBuilder);
+                RenderSystem.setShaderTexture(0, VIEWPORT);
+                drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
             }
 
             //From here on out, we aren't allowed to draw pixels outside the viewport we created above ^
@@ -144,9 +138,13 @@ public class CardElement extends StencilElement {
                 RenderSystem.setShaderTexture(0, backgroundOverlay);
 
                 matrixStack.push();
-                //drawTexture(matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height)
                 drawTexture(matrixStack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
                 matrixStack.pop();
+            }
+
+            //render effect
+            {
+                //drawSprite(matrixStack, -16, -16, 0, 96, 128, EFFECT_ATLAS_TEXTURE.getSprite(CardEffects.LINES.id));
             }
 
             //render texts
@@ -154,14 +152,16 @@ public class CardElement extends StencilElement {
                 //name
                 matrixStack.push();
                 matrixStack.translate(3f, 3f, 2f); //3px offset
-                drawTextWithShadow(matrixStack, client.textRenderer, name, 0, 0, 0xffffff);
+                String nameString = client.textRenderer.trimToWidth(name.getString(), 59); // 64 - 3 - 2
+                drawStringWithShadow(matrixStack, client.textRenderer, nameString, 0, 0, 0xffffff);
                 matrixStack.pop();
 
                 //author
                 matrixStack.push();
                 matrixStack.translate(3f, 11f, 2f); //3px offset + 7px above text + 1px spacing
                 matrixStack.scale(0.75f, 0.75f,1f);
-                drawTextWithShadow(matrixStack, client.textRenderer, author, 0, 0, 0xffffff);
+                String authorString = client.textRenderer.trimToWidth(author.getString(), 75); //64 + 64 * 0.75 - 3 - 2
+                drawStringWithShadow(matrixStack, client.textRenderer, authorString, 0, 0, 0xffffff);
                 matrixStack.pop();
             }
 
@@ -182,65 +182,35 @@ public class CardElement extends StencilElement {
 
     }
 
-    public static void renderBackground(MatrixStack matrixStack, CardBackground background) {
+    public void renderBackground(MatrixStack matrixStack, CardBackground background) {
         //prepare render
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.DST_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-
         matrixStack.push();
-        matrixStack.translate(32f, 48f, 0f);
-        float scale = 1.5f;
+        matrixStack.translate(-48f, -32f, 0f);
 
-        for (int i = 0; i < background.ids.length; i++, scale -= 0.15f) {
+        float strength = 1.5f;
+        for (int i = 0; i < background.ids.length; i++, strength -= 0.25f) {
             //prepare background
             RenderSystem.setShaderTexture(0, background.ids[i]);
             matrixStack.push();
-            matrixStack.translate(-32f * scale, -48f * scale, -64f * scale);
-            matrixStack.scale(scale, scale, scale);
 
-            //back
-            drawTexture(matrixStack, 0, 0, 64, 96, 64, 64, 64, 96, 192, 160);
+            //fake parallax effect - thx wolfy
+            float x = MathHelper.clamp(((-this.rotation.getY() * strength) / 90) * 48, -48, 48);
+            float y = MathHelper.clamp(((this.rotation.getX() * strength) / 90) * 32, -32, 32);
+            matrixStack.translate(x, y, 0);
 
-            //left
-            matrixStack.push();
-            matrixStack.translate(0f, 0f, 64f);
-            matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90f));
-            drawTexture(matrixStack, 0, 0, 64, 96, 0, 64, 64, 96, 192, 160);
-            matrixStack.pop();
-
-            //right
-            matrixStack.push();
-            matrixStack.translate(64f, 0f, 0f);
-            matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-90f));
-            drawTexture(matrixStack, 0, 0, 64, 96, 128, 64, 64, 96, 192, 160);
-            matrixStack.pop();
-
-            //top
-            matrixStack.push();
-            matrixStack.translate(0f, 0f, 64f);
-            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90f));
-            drawTexture(matrixStack, 0, 0, 64, 64, 0, 0, 64, 64, 192, 160);
-            matrixStack.pop();
-
-            //bottom
-            matrixStack.push();
-            matrixStack.translate(0f, 96f, 0f);
-            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90f));
-            drawTexture(matrixStack, 0, 0, 64, 64, 64, 0, 64, 64, 192, 160);
-            matrixStack.pop();
+            //drawTexture(matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height)
+            drawTexture(matrixStack, 0, 0, 160, 160, 0, 0, 160, 160, 160, 160);
 
             matrixStack.pop();
         }
 
         matrixStack.pop();
-
     }
 
     @Override
     public Vector2f getSize() {
         return new Vector2f(64 * scaleCurrent.getX(), 94 * scaleCurrent.getY());
     }
-
 
     public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity livingEntity, MatrixStack matrixStack) {
         //rotation
