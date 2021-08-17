@@ -41,7 +41,7 @@ public class FiguraGuiScreen extends Screen {
         allPanels.add(debugPanel);
         allPanels.add(wardrobePanel);
 
-        switchToPanel(debugPanel);
+        switchToPanel(wardrobePanel);
     }
 
     public void switchToPanel(FiguraPanel newPanel) {
@@ -151,11 +151,11 @@ public class FiguraGuiScreen extends Screen {
 
         stack.push();
 
-        stack.translate(width / 2.0f, 20, 0);
-        stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-5));
+        stack.translate(width / 2.0f, 13, 0);
+        stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-13));
 
         RenderSystem.setShaderTexture(0, new Identifier("figura", "textures/cards/cheese_platform.png"));
-        drawTexture(stack, -60, -26, 120, 48, 0, 0, 240, 96, 240, 96);
+        drawTexture(stack, -60, -18, 120, 48, 0, 0, 240, 96, 240, 96);
 
         int currIndex = allPanels.indexOf(currentPanel);
 
@@ -177,7 +177,7 @@ public class FiguraGuiScreen extends Screen {
             stack.push();
 
             stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(realRot));
-            stack.translate(-width / 2f, 0, 45);
+            stack.translate(-width / 2f, 0, 57);
 
             drawTextWithShadow(stack, textRenderer, txt, 0, 0, 0xffffff);
 

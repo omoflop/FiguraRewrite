@@ -25,15 +25,13 @@ public class CardElement extends StencilElement {
     public final Identifier backgroundOverlay = new Identifier("figura", "textures/cards/background_overlay.png");
     public final Text name;
     public final Text author;
-    public final LivingEntity entity;
 
     public MinecraftClient client;
 
-    public CardElement(CardBackground background, Text name, Text author, LivingEntity entity, int stencilLayerID) {
+    public CardElement(CardBackground background, Text name, Text author, int stencilLayerID) {
         this.background = background;
         this.name = name;
         this.author = author;
-        this.entity = entity;
 
         this.client = MinecraftClient.getInstance();
         this.stencilLayerID = stencilLayerID;
@@ -58,6 +56,7 @@ public class CardElement extends StencilElement {
         );
 
         public final Identifier[] ids;
+
         CardBackground(Identifier... ids) {
             this.ids = ids;
         }
@@ -68,6 +67,7 @@ public class CardElement extends StencilElement {
 
         public final Identifier id;
         public final Identifier texture;
+
         CardEffects(Identifier id, Identifier texture) {
             this.id = id;
             this.texture = texture;
@@ -103,17 +103,7 @@ public class CardElement extends StencilElement {
             //background
             renderBackground(matrixStack, background);
 
-            //render model
-            {
-                RenderSystem.enableDepthTest();
-
-                matrixStack.push();
-                matrixStack.translate(0, 0, -15);
-                drawEntity(32, 48, 30, 0, 0, entity, matrixStack);
-                matrixStack.pop();
-
-                RenderSystem.disableDepthTest();
-            }
+            renderCardContent(matrixStack, mouseX, mouseY, delta);
 
             //After this point, the stencil buffer is *effectively* turned off.
             //No values will be written to the stencil buffer, and all objects will render
@@ -194,8 +184,8 @@ public class CardElement extends StencilElement {
             matrixStack.push();
 
             //fake parallax effect - thx wolfy
-            float x = MathHelper.clamp(((-this.rotation.getY() * strength) / 90) * 48, -48, 48);
-            float y = MathHelper.clamp(((this.rotation.getX() * strength) / 90) * 32, -32, 32);
+            float x = MathHelper.clamp(((-this.rotationCurrent.getY() * strength) / 90) * 48, -48, 48);
+            float y = MathHelper.clamp(((this.rotationCurrent.getX() * strength) / 90) * 32, -32, 32);
             matrixStack.translate(x, y, 0);
 
             //drawTexture(matrices, x, y, x size, y size, u offset, v offset, u size, v size, texture width, texture height)
@@ -209,67 +199,10 @@ public class CardElement extends StencilElement {
 
     @Override
     public Vector2f getSize() {
-        return new Vector2f(64 * scaleCurrent.getX(), 94 * scaleCurrent.getY());
+        return new Vector2f(64, 94);
     }
 
-    public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity livingEntity, MatrixStack matrixStack) {
-        //rotation
-        float h = Float.isNaN(yaw) ? 0f : (float) Math.atan(yaw / 40f);
-        float l = Float.isNaN(pitch) ? 0f : (float) Math.atan(pitch / 40f);
-
-        //apply matrix transformers
-        matrixStack.push();
-        matrixStack.translate(x, y, 0);
-        matrixStack.scale(1f, 1f, -1f);
-        matrixStack.scale((float) scale, (float) scale, (float) scale);
-
-        Quaternion quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180f);
-        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(0f);
-        quaternion.hamiltonProduct(quaternion2);
-        matrixStack.multiply(quaternion);
-        quaternion2.conjugate();
-
-        //backup entity variables
-        float bodyYaw = livingEntity.bodyYaw;
-        float entityYaw = livingEntity.getYaw();
-        float entityPitch = livingEntity.getPitch();
-        float prevHeadYaw = livingEntity.prevHeadYaw;
-        float headYaw = livingEntity.headYaw;
-
-        //apply entity rotation
-        livingEntity.bodyYaw = 180f + h * 20f;
-        livingEntity.setYaw(180f + h * 40f);
-        livingEntity.setPitch(-l * 20f);
-        livingEntity.headYaw = livingEntity.getYaw();
-        livingEntity.prevHeadYaw = livingEntity.getYaw();
-
-        //setup entity renderer
-        RenderSystem.setShaderLights(Vec3f.ZERO, Vec3f.ZERO);
-        //DiffuseLighting.method_34742();
-        EntityRenderDispatcher entityRenderDispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
-        boolean renderHitboxes = entityRenderDispatcher.shouldRenderHitboxes();
-        entityRenderDispatcher.setRenderHitboxes(false);
-        entityRenderDispatcher.setRenderShadows(false);
-        entityRenderDispatcher.setRotation(quaternion2);
-        VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-
-        //render
-        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(livingEntity, 0d, -1d, 0d, 0f, 1f, matrixStack, immediate, 0xf000f0));
-        immediate.draw();
-
-        //restore entity rendering data
-        entityRenderDispatcher.setRenderHitboxes(renderHitboxes);
-        entityRenderDispatcher.setRenderShadows(true);
-
-        //restore entity data
-        livingEntity.bodyYaw = bodyYaw;
-        livingEntity.setYaw(entityYaw);
-        livingEntity.setPitch(entityPitch);
-        livingEntity.prevHeadYaw = prevHeadYaw;
-        livingEntity.headYaw = headYaw;
-
-        //pop matrix
-        matrixStack.pop();
-        DiffuseLighting.enableGuiDepthLighting();
+    protected void renderCardContent(MatrixStack stack, int i, int j, float f) {
     }
+
 }

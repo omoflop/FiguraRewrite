@@ -3,6 +3,7 @@ package net.blancworks.figura.gui.panels;
 import net.blancworks.figura.gui.FiguraGuiScreen;
 import net.blancworks.figura.gui.FiguraPanel;
 import net.blancworks.figura.gui.elements.CardElement;
+import net.blancworks.figura.gui.elements.EntityCardElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
@@ -29,12 +30,12 @@ public class FiguraDebugPanel extends FiguraPanel {
         RabbitEntity entity1 = new RabbitEntity(EntityType.RABBIT, world);
         entity1.setRabbitType(99);
 
-        cards.add(new CardElement(CardElement.CardBackground.BLUE, new LiteralText("Booni"), new LiteralText("Fran"), entity1, 10));
-        cards.add(new CardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Axolotl"), new LiteralText("Fran"), new AxolotlEntity(EntityType.AXOLOTL, world), 15));
-        cards.add(new CardElement(CardElement.CardBackground.FADE, new LiteralText("Me!"), new LiteralText("Fran"), MinecraftClient.getInstance().player, 20));
-        cards.add(new CardElement(CardElement.CardBackground.FLAMES, new LiteralText("Really long name"), new LiteralText("made by really long Fran"), new BlazeEntity(EntityType.BLAZE, world), 25));
-        cards.add(new CardElement(CardElement.CardBackground.SPACE, new LiteralText("SPACE!"), new LiteralText("Fran"), new DolphinEntity(EntityType.DOLPHIN, world), 30));
-        cards.add(new CardElement(CardElement.CardBackground.DEBUG, new LiteralText("<debug>"), new LiteralText("Fran"), new ArmorStandEntity(EntityType.ARMOR_STAND, world), 35));
+        cards.add(new EntityCardElement(CardElement.CardBackground.BLUE, new LiteralText("Booni"), new LiteralText("Fran"), 10, entity1));
+        cards.add(new EntityCardElement(CardElement.CardBackground.CLOUDS, new LiteralText("Axolotl"), new LiteralText("Fran"), 15, new AxolotlEntity(EntityType.AXOLOTL, world)));
+        cards.add(new EntityCardElement(CardElement.CardBackground.FADE, new LiteralText("Me!"), new LiteralText("Fran"), 20, MinecraftClient.getInstance().player));
+        cards.add(new EntityCardElement(CardElement.CardBackground.FLAMES, new LiteralText("uwu"), new LiteralText("Fran"), 25, new BlazeEntity(EntityType.BLAZE, world)));
+        cards.add(new EntityCardElement(CardElement.CardBackground.SPACE, new LiteralText("SPACE!"), new LiteralText("Fran"), 30, new DolphinEntity(EntityType.DOLPHIN, world)));
+        cards.add(new EntityCardElement(CardElement.CardBackground.DEBUG, new LiteralText("<debug>"), new LiteralText("Fran"), 35, new ArmorStandEntity(EntityType.ARMOR_STAND, world)));
     }
 
     @Override

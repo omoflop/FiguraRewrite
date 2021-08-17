@@ -16,6 +16,9 @@ public abstract class FiguraGuiElement extends DrawableHelper {
     protected Vector2f scaleCurrent = new Vector2f(1,1);
 
     public float smoothingFactor = 1;
+    
+    //Arbitrary boolean that can be used by other things to determine if the card is "ready" to be displayed.
+    public boolean isReady = false;
 
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta){
         positionCurrent = new Vector2f(
@@ -47,5 +50,11 @@ public abstract class FiguraGuiElement extends DrawableHelper {
         stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(rotationCurrent.getY()));
         stack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotationCurrent.getZ()));
         stack.scale(scaleCurrent.getX(), scaleCurrent.getY(), 1);
+    }
+    
+    public void setTransformsToTarget(){
+        positionCurrent = position;
+        rotationCurrent = rotation;
+        scaleCurrent = scale;
     }
 }
