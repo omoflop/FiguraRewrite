@@ -41,7 +41,15 @@ public class CardElement extends StencilElement {
 
     public enum CardBackground {
         DEBUG(new Identifier("figura", "textures/cards/backgrounds/debug.png")),
-        BLUE(new Identifier("figura", "textures/cards/backgrounds/blue.png")),
+        BLUE(
+                new Identifier("figura", "textures/cards/backgrounds/blue/background.png"),
+                new Identifier("figura", "textures/cards/backgrounds/blue/layer1.png"),
+                new Identifier("figura", "textures/cards/backgrounds/blue/layer2.png"),
+                new Identifier("figura", "textures/cards/backgrounds/blue/layer3.png"),
+                new Identifier("figura", "textures/cards/backgrounds/blue/layer4.png"),
+                new Identifier("figura", "textures/cards/backgrounds/blue/layer5.png"),
+                new Identifier("figura", "textures/cards/backgrounds/blue/layer6.png")
+        ),
         CLOUDS(
                 new Identifier("figura", "textures/cards/backgrounds/clouds/background.png"),
                 new Identifier("figura", "textures/cards/backgrounds/clouds/moon.png"),

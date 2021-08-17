@@ -41,7 +41,7 @@ public class FiguraGuiScreen extends Screen {
         allPanels.add(debugPanel);
         allPanels.add(wardrobePanel);
 
-        switchToPanel(wardrobePanel);
+        switchToPanel(debugPanel);
     }
 
     public void switchToPanel(FiguraPanel newPanel) {
