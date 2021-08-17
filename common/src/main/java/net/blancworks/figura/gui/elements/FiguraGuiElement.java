@@ -4,7 +4,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector2f;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 
 public abstract class FiguraGuiElement extends DrawableHelper {
@@ -18,7 +17,7 @@ public abstract class FiguraGuiElement extends DrawableHelper {
 
     public float smoothingFactor = 1;
 
-    public void render(MatrixStack matrixStack, int i, int j, float f){
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta){
         positionCurrent = new Vector2f(
                 MathHelper.lerp(smoothingFactor, positionCurrent.getX(), position.getX()),
                 MathHelper.lerp(smoothingFactor, positionCurrent.getY(), position.getY())
@@ -36,12 +35,11 @@ public abstract class FiguraGuiElement extends DrawableHelper {
         );
     }
 
-    public void tick(){
+    public void tick() {
         
     }
 
     public abstract Vector2f getSize();
-
 
     public void setupTransforms(MatrixStack stack) {
         stack.translate(positionCurrent.getX(), positionCurrent.getY(), 0);

@@ -33,6 +33,19 @@ public class FiguraMod {
 
         ClientTickEvent.CLIENT_POST.register((c)-> FiguraNetworkManager.handler.tick());
 
+        /*
+        //EFFECT ATLAS
+        CardElement.EFFECT_ATLAS_TEXTURE = new SpriteAtlasTexture(new Identifier("figura", "textures/atlas/card_effects.png"));
+        MinecraftClient.getInstance().getTextureManager().registerTexture(CardElement.EFFECT_ATLAS_TEXTURE.getId(), CardElement.EFFECT_ATLAS_TEXTURE);
+
+        Map<Identifier, List<Identifier>> map = Maps.newConcurrentMap();
+        List<Identifier> list = List.of(CardElement.CardEffects.LINES.texture);
+        map.put(CardElement.CardEffects.LINES.id, list.stream().map((textIdentifier) -> new Identifier(textIdentifier.getNamespace(), "cards/effects/" + textIdentifier.getPath())).collect(Collectors.toList()));
+
+        SpriteAtlasTexture.Data data = CardElement.EFFECT_ATLAS_TEXTURE.stitch(MinecraftClient.getInstance().getResourceManager(), map.values().stream().flatMap(Collection::stream), MinecraftClient.getInstance().getProfiler(), 0);
+        CardElement.EFFECT_ATLAS_TEXTURE.upload(data);
+         */
+
         FiguraAvatarManager.init();
     }
 

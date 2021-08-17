@@ -4,16 +4,9 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
@@ -40,35 +33,35 @@ public class FiguraGUIFramebuffer {
      * @param nHeight The new height
      */
     public void setSize(int nWidth, int nHeight) {
-        
+
         //Minimized window, we don't even need the framebuffer, so...
         if(nWidth == 0 || nHeight == 0)
             return;
-            
+
         if (nWidth != width || nHeight != height) {
             width = nWidth;
             height = nHeight;
 
-            if(this.fbo != -1){
+            if (this.fbo != -1) {
                 GlStateManager._glDeleteFramebuffers(this.fbo);
                 fbo = -1;
             }
-            if(this.colorAttachment != -1){
+            if (this.colorAttachment != -1) {
                 TextureUtil.releaseTextureId(this.colorAttachment);
                 this.colorAttachment = -1;
             }
-            if(this.depthStencilAttachment != -1){
+            if (this.depthStencilAttachment != -1) {
                 TextureUtil.releaseTextureId(this.depthStencilAttachment);
                 this.depthStencilAttachment = -1;
             }
-            
+
             this.fbo = GlStateManager.glGenFramebuffers();
             this.colorAttachment = TextureUtil.generateTextureId();
             this.depthStencilAttachment = TextureUtil.generateTextureId();
 
             GlStateManager._bindTexture(this.depthStencilAttachment);
             GlStateManager._texImage2D(GL11.GL_TEXTURE_2D, 0, GL30.GL_DEPTH24_STENCIL8, width, height, 0, GL30.GL_DEPTH_STENCIL, GL30.GL_UNSIGNED_INT_24_8, (IntBuffer)null);
-            
+
             GlStateManager._bindTexture(this.colorAttachment);
             GlStateManager._texImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (IntBuffer)null);
 

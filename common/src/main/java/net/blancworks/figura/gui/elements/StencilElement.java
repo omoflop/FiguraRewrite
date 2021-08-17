@@ -1,12 +1,10 @@
 package net.blancworks.figura.gui.elements;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 
-public abstract class StencilElement extends FiguraGuiElement{
-    
+public abstract class StencilElement extends FiguraGuiElement {
+
     public int stencilLayerID = 1;
 
     /**
@@ -14,7 +12,7 @@ public abstract class StencilElement extends FiguraGuiElement{
      *
      * Every pixel drawn in this rendering mode is set to the stencil layer ID.
      */
-    public void setupStencilWrite(){
+    public void setupStencilWrite() {
         //Allow writing to stencil buffer
         GlStateManager._stencilMask(0xFF);
 
@@ -32,7 +30,7 @@ public abstract class StencilElement extends FiguraGuiElement{
      *
      * If the pixel at a given location doesn't match the stencil ID, the pixel does not draw.
      */
-    public void setupStencilTest(){
+    public void setupStencilTest() {
         //Turn off writing to stecil buffer, we're only testing against it here.
         GlStateManager._stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
         GlStateManager._stencilMask(0x00);
@@ -44,7 +42,7 @@ public abstract class StencilElement extends FiguraGuiElement{
     /**
      * Turns "off" stencil testing without actually disabling it.
      */
-    public void resetStencilState(){
+    public void resetStencilState() {
         //Turn off writing to stecil buffer.
         GlStateManager._stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
         GlStateManager._stencilMask(0x00);

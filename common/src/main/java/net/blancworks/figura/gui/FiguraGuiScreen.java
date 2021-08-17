@@ -2,21 +2,19 @@ package net.blancworks.figura.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.blancworks.figura.gui.panels.FiguraMainPanel;
+import net.blancworks.figura.gui.panels.FiguraDebugPanel;
 import net.blancworks.figura.gui.panels.FiguraWardrobePanel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * This is the generic, top-level screen that's used in minecraft itself for the menu.
@@ -31,22 +29,19 @@ public class FiguraGuiScreen extends Screen {
 
     private final ArrayList<FiguraPanel> allPanels = new ArrayList<>();
 
-    public FiguraMainPanel mainPanel = new FiguraMainPanel(this);
+    public FiguraDebugPanel debugPanel = new FiguraDebugPanel(this);
     public FiguraWardrobePanel wardrobePanel = new FiguraWardrobePanel(this);
 
     public final FiguraGUIFramebuffer guiFramebuffer = new FiguraGUIFramebuffer();
 
     public FiguraGuiScreen(Screen parentScreen) {
         super(new TranslatableText("gui.figura.mainpanel"));
+        this.parentScreen = parentScreen;
 
-        allPanels.add(mainPanel);
-        allPanels.add(wardrobePanel);
-        allPanels.add(wardrobePanel);
-        allPanels.add(wardrobePanel);
+        allPanels.add(debugPanel);
         allPanels.add(wardrobePanel);
 
-
-        switchToPanel(wardrobePanel);
+        switchToPanel(debugPanel);
     }
 
     public void switchToPanel(FiguraPanel newPanel) {
@@ -57,13 +52,12 @@ public class FiguraGuiScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int i, int j, float f) {
-        super.render(matrixStack, i, j, f);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+        super.render(matrixStack, mouseX, mouseY, delta);
 
         int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
         int windowHeight = MinecraftClient.getInstance().getWindow().getHeight();
         guiFramebuffer.setSize(windowWidth, windowHeight);
-
 
         //Enable stencil buffer during this phase of rendering
         GL30.glEnable(GL30.GL_STENCIL_TEST);
@@ -80,9 +74,8 @@ public class FiguraGuiScreen extends Screen {
         MinecraftClient.getInstance().getFramebuffer().draw(windowWidth, windowHeight, false);
         RenderSystem.restoreProjectionMatrix();
 
-        drawMenuSelector(matrixStack, i, j, f);
-
-        if (currentPanel != null) currentPanel.render(matrixStack, i, j, f);
+        drawMenuSelector(matrixStack, mouseX, mouseY, delta);
+        if (currentPanel != null) currentPanel.render(matrixStack, mouseX, mouseY, delta);
 
         //Reset state before we go back to normal rendering
         GlStateManager._enableDepthTest();
@@ -107,70 +100,69 @@ public class FiguraGuiScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (currentPanel != null) return currentPanel.mouseClicked(d, e, i);
-        return super.mouseClicked(d, e, i);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (currentPanel != null) return currentPanel.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if (currentPanel != null) return currentPanel.mouseDragged(d, e, i, f, g);
-        return super.mouseDragged(d, e, i, f, g);
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (currentPanel != null) return currentPanel.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
-        if (currentPanel != null) return currentPanel.mouseReleased(d, e, i);
-        return super.mouseReleased(d, e, i);
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (currentPanel != null) return currentPanel.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
-    public void mouseMoved(double d, double e) {
-        if (currentPanel != null) currentPanel.mouseMoved(d, e);
-        super.mouseMoved(d, e);
+    public void mouseMoved(double mouseX, double mouseY) {
+        if (currentPanel != null) currentPanel.mouseMoved(mouseX, mouseY);
+        super.mouseMoved(mouseX, mouseY);
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
-        if (currentPanel != null) return currentPanel.mouseScrolled(d, e, f);
-        return super.mouseScrolled(d, e, f);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (currentPanel != null) return currentPanel.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) return true;
-        if (currentPanel != null) return currentPanel.keyPressed(i, j, k);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) return true;
+        if (currentPanel != null) return currentPanel.keyPressed(keyCode, scanCode, modifiers);
 
         return false;
     }
 
     @Override
-    public boolean keyReleased(int i, int j, int k) {
-        if (super.keyReleased(i, j, k)) return true;
-        if (currentPanel != null) return currentPanel.keyReleased(i, j, k);
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (super.keyReleased(keyCode, scanCode, modifiers)) return true;
+        if (currentPanel != null) return currentPanel.keyReleased(keyCode, scanCode, modifiers);
 
         return false;
     }
-
 
     private float rot = 0;
 
-    private void drawMenuSelector(MatrixStack stack, int i, int j, float f) {
+    private void drawMenuSelector(MatrixStack stack, int mouseX, int mouseY, float delta) {
 
         stack.push();
 
         stack.translate(width / 2.0f, 20, 0);
         stack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-5));
 
+        RenderSystem.setShaderTexture(0, new Identifier("figura", "textures/cards/cheese_platform.png"));
+        drawTexture(stack, -60, -26, 120, 48, 0, 0, 240, 96, 240, 96);
+
         int currIndex = allPanels.indexOf(currentPanel);
 
         //rot = MathHelper.lerp(0.1f, rot, currIndex * 45);
-
-        rot = (rot + f * 4);
+        rot = (rot + delta * 4);
 
         int index = 0;
-
-        float offset = 0;
 
         for (FiguraPanel panel : allPanels) {
             Text txt = panel.getName();
@@ -185,12 +177,9 @@ public class FiguraGuiScreen extends Screen {
             stack.push();
 
             stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(realRot));
-            stack.translate(-width/2.0f, 0, 45);
+            stack.translate(-width / 2f, 0, 45);
 
             drawTextWithShadow(stack, textRenderer, txt, 0, 0, 0xffffff);
-
-            if (index == 0) offset -= width / 2.0f;
-            offset += width + 10;
 
             stack.pop();
         }
